@@ -1,29 +1,29 @@
 #!/bin/bash
 
-# Solicitar el nombre del dominio y la contraseña al usuario
-read -p "Por favor, introduce el nombre de tu dominio (ejemplo: midominio): " dominio
-read -s -p "Por favor, introduce la contraseña para el administrador LDAP: " contrasena
+# Prompt the user for the domain name and admin password
+read -p "Please enter your domain name (e.g., mydomain): " dominio
+read -s -p "Please enter the admin password for LDAP: " contrasena
 echo
 
-# Convertir el dominio en formato LDAP
+# Convert the domain to LDAP format
 dominio_ldap=$(echo "$dominio" | sed 's/\./,dc=/g')
 
-# Actualizar el sistema
+# Update the system
 sudo apt-get update
 sudo apt-get upgrade -y
 
-# === Instalación y configuración de OpenLDAP ===
+# === OpenLDAP Installation and Configuration ===
 sudo apt-get install -y slapd ldap-utils
 
 sudo dpkg-reconfigure slapd
 
-# Configurar OpenLDAP
+# Configure OpenLDAP
 cat <<EOF | sudo tee /etc/ldap/ldap.conf
 BASE    dc=$dominio_ldap
 URI     ldap://localhost
 EOF
 
-# Crear entradas iniciales para la base LDAP
+# Create initial entries for the LDAP base
 cat <<EOF | sudo tee base.ldif
 dn: dc=$dominio_ldap
 objectClass: top
@@ -40,22 +40,22 @@ description: LDAP administrator
 userPassword: $(slappasswd -s $contrasena)
 EOF
 
-# Añadir entradas a la base LDAP
+# Add entries to the LDAP base
 sudo ldapadd -x -D cn=admin,dc=$dominio_ldap -w "$contrasena" -f base.ldif
 
-# Verificar configuración
+# Verify the configuration
 sudo ldapsearch -x -LLL -b dc=$dominio_ldap
 
-# === Instalación y configuración de phpLDAPadmin ===
+# === phpLDAPadmin Installation and Configuration ===
 sudo apt-get install -y phpldapadmin
 
-# Configurar phpLDAPadmin
+# Configure phpLDAPadmin
 sudo sed -i "s/\$servers->setValue('server','host','127.0.0.1');/\$servers->setValue('server','host','localhost');/" /etc/phpldapadmin/config.php
 sudo sed -i "s/\$servers->setValue('server','base',array('dc=example,dc=com'));/\$servers->setValue('server','base',array('dc=$dominio_ldap'));/g" /etc/phpldapadmin/config.php
 sudo sed -i "s/\$servers->setValue('login','bind_id','cn=admin,dc=example,dc=com');/\$servers->setValue('login','bind_id','cn=admin,dc=$dominio_ldap');/" /etc/phpldapadmin/config.php
 
-# Reiniciar Apache
+# Restart Apache
 sudo systemctl restart apache2
 
-echo "Instalación y configuración completadas para el dominio $dominio."
-echo "Puedes acceder a phpLDAPadmin en http://localhost/phpldapadmin"
+echo "Installation and configuration completed for domain $dominio."
+echo "You can access phpLDAPadmin at http://localhost/phpldapadmin"
