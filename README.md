@@ -2,7 +2,7 @@
 
 This is a bash script that automatically installs and configures openldap and phpLDAPadmin, being only necessary to enter the domain name and password of the same.
 
-# ¡¡¡Only tested on Debian 12 Bookworm!!!
+# ¡¡¡Only tested on Debian 12 Bookworm and Ubuntu 24.04.1 LTS!!!
 
 # Steps prior to the execution of the script
 
