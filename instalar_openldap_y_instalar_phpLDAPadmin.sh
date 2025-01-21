@@ -59,3 +59,5 @@ sudo systemctl restart apache2
 
 echo "Installation and configuration completed for domain $dominio."
 echo "You can access phpLDAPadmin at http://localhost/phpldapadmin"
+
+##################
