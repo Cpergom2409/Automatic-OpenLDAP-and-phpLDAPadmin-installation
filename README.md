@@ -6,6 +6,6 @@ This is a bash script that automatically installs and configures openldap and ph
 
 # Steps prior to the execution of the script
 
-Go to the /etc/hosts directory and if you have chosen to create a domain name in the Debian installation you must delete the line 127.0.0.1 <Domain name>.
+Go to the /etc/hosts directory and if you have chosen to create a domain name in the Debian installation you must delete the line 127.0.0.1 <"Domain name">.
 
 
